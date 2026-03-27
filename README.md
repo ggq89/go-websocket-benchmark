@@ -1,6 +1,9 @@
 # go-websocket-benchmark
 - support 1m-connections client
 
+## Reference
+- [How to Build WebSockets in Go (2019)](https://tonybai.com/2019/09/28/how-to-build-websockets-in-go/) — 适合作为 Go WebSocket 入门参考。文中推荐 gobwas 性能最优、gorilla 次之，但该结论基于 2019 年的微基准测试（单次操作内存分配），与本项目 2024 年初高并发场景下的测试结果有较大差异。各库在过去几年中均有大量优化，且本项目涵盖了许多 2019 年后才出现的框架（gws、nbio、quickws、greatws 等），性能选型请以最新测试数据为准。
+
 ## before running the test
 - make sure setting the correct system env, for example:
 
@@ -135,3 +138,18 @@ result:
 | greatws          | 141385 | 412.66 | 25.55us | 70.62ms | 1.05s | 37.50ms | 42.03ms | 143.13ms | 373.50ms | 463.37ms | 14.15s | 2000000 | 2000000 | 0      | 1000000 | 10000       | 1024    | 112.40  | 342.62  | 399.85  | 575.97M | 576.48M | 576.86M |
 | greatws_event    | 145457 | 514.79 | 24.77us | 68.66ms | 1.00s | 35.80ms | 38.67ms | 140.22ms | 373.21ms | 453.04ms | 13.75s | 2000000 | 2000000 | 0      | 1000000 | 10000       | 1024    | 48.71   | 282.56  | 340.90  | 447.33M | 448.25M | 448.86M |
 ----------------------------------------------------------------------------------------------------
+
+
+## Conclusions (based on benchmark data from early 2024, results may differ with current library versions)
+
+1. **TPS (Throughput)**: In the 10k-connection Echo benchmark, `gws_std`, `nbio_mixed`, `quickws`, and `nettyws` performed best with TPS exceeding 770k. `hertz` and `gobwas` were relatively slower.
+
+2. **Memory Efficiency**: `nbio_nonblocking` had the lowest memory footprint (~87-104MB), significantly less than other frameworks. `quickws`, `greatws`, `greatws_event`, and `nettyws` also performed well (150-207MB). `hertz` consumed the most memory (523-841MB).
+
+3. **EER (Energy Efficiency Ratio)**: `greatws_event` and `nbio_nonblocking` achieved the highest EER (1158 and 1044 respectively), meaning they handle more requests per unit of CPU, making them ideal for resource-sensitive scenarios.
+
+4. **Latency**: Most frameworks had similar TP50 latency (10-13ms). However, `gobwas` and `nhooyr` showed significantly higher TP99 tail latency (>100ms), indicating less stability under load.
+
+5. **1M Connections**: Only `nbio_nonblocking`, `greatws`, and `greatws_event` were tested at 1M connections. `nbio_nonblocking` had the highest TPS (152k), while `greatws_event` was the most memory-efficient (~448MB) with the best EER (514).
+
+6. **Reliability (Rate Mode)**: Under rate-limited sending (SendRate=200), `quickws`, `gorilla`, and `nettyws` achieved zero packet loss (Sent = Recv). `gobwas`, `nhooyr`, and `hertz` showed some packet loss.
