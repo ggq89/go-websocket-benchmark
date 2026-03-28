@@ -1,6 +1,18 @@
 # go-websocket-benchmark
 - support 1m-connections client
 
+## Frameworks
+- [fasthttp/websocket](https://github.com/fasthttp/websocket)
+- [gobwas/ws](https://github.com/gobwas/ws)
+- [gorilla/websocket](https://github.com/gorilla/websocket)
+- [lxzan/gws](https://github.com/lxzan/gws)
+- [cloudwego/hertz](https://github.com/cloudwego/hertz) + [hertz-contrib/websocket](https://github.com/hertz-contrib/websocket)
+- [lesismal/nbio](https://github.com/lesismal/nbio)
+- [go-netty/go-netty-ws](https://github.com/go-netty/go-netty-ws)
+- [nhooyr/websocket](https://github.com/nhooyr/websocket)
+- [antlabs/quickws](https://github.com/antlabs/quickws)
+- [antlabs/greatws](https://github.com/antlabs/greatws)
+
 ## Reference
 - [How to Build WebSockets in Go (2019)](https://tonybai.com/2019/09/28/how-to-build-websockets-in-go/) — 适合作为 Go WebSocket 入门参考。文中推荐 gobwas 性能最优、gorilla 次之，但该结论基于 2019 年的微基准测试（单次操作内存分配），与本项目 2024 年初高并发场景下的测试结果有较大差异。各库在过去几年中均有大量优化，且本项目涵盖了许多 2019 年后才出现的框架（gws、nbio、quickws、greatws 等），性能选型请以最新测试数据为准。
 
